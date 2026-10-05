@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:id="@+id/main"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+tools:context=".MainActivity">
+
+<TextView
+    android:id="@+id/Tytul"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="20dp"
+    android:text="REJESTRACJA"
+    android:textSize="30sp"
+    android:textStyle="bold" />
+
+
+<TextView
+    android:id="@+id/Podtytul"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="10dp"
+    android:text="Utworz nowe konto"
+    android:textSize="17sp" />
+
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="30dp"
+    android:text="Imie"
+    android:textSize="16sp" />
+
+
+<EditText
+    android:id="@+id/Imie"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:hint="Wpisz imie"
+    android:inputType="textPersonName" />
+
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:text="Nazwisko"
+    android:textSize="16sp" />
+
+
+<EditText
+    android:id="@+id/Nazwisko"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:hint="Wpisz nazwisko"
+    android:inputType="textPersonName" />
+
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:text="Email"
+    android:textSize="16sp" />
+
+
+<EditText
+    android:id="@+id/Email"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:hint="Wpisz email"
+    android:inputType="textEmailAddress" />
+
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:text="Haslo"
+    android:textSize="16sp" />
+
+
+<EditText
+    android:id="@+id/Haslo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:hint="Wpisz haslo"
+    android:inputType="textPassword" />
+
+
+<Button
+    android:id="@+id/Zarejestruj"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="30dp"
+    android:text="ZAREJESTRUJ" />
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+package com.example.dzmobile1;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        EditText imie = findViewById(R.id.Imie);
+        EditText nazwisko = findViewById(R.id.Nazwisko);
+        EditText email = findViewById(R.id.Email);
+        EditText haslo = findViewById(R.id.Haslo);
+        Button zarejestruj = findViewById(R.id.Zarejestruj);
+
+        zarejestruj.setOnClickListener(v -> {
+
+            String imieText = imie.getText().toString().trim();
+            String nazwiskoText = nazwisko.getText().toString().trim();
+            String emailText = email.getText().toString().trim();
+            String hasloText = haslo.getText().toString().trim();
+
+            if (imieText.isEmpty() || nazwiskoText.isEmpty() || emailText.isEmpty() || hasloText.isEmpty()) {
+
+                Toast.makeText(MainActivity.this,"Uzupelnij wszystkie pola",Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!emailText.contains("@") || !emailText.contains(".")) {
+                Toast.makeText(MainActivity.this,"Podaj poprawny adres email",Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (hasloText.length() < 8 || !hasloText.matches(".*[A-Z].*") || !hasloText.matches(".*[a-z].*") || !hasloText.matches(".*[!@#$%^&*()_+{}?;':<>,./\\\\=\\-].*")) {
+                Toast.makeText(MainActivity.this,"Haslo musi miec co najmniej 8 znaków, Duza i Mala literee oraz znak specjalny",Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            Toast.makeText(
+                    MainActivity.this,"Dane sa poprawne",Toast.LENGTH_SHORT).show();
+        });
+    }
+}
+
+
