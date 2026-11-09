@@ -1,0 +1,184 @@
+package com.example.losowaniekostek;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.GridLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    // KROK 4: Deklaracje zmiennych odpowiadających elementom interfejsu
+    private EditText editTextLiczbaKostek;
+    private Button buttonLosuj;
+    private Button buttonRosnaco;
+    private Button buttonMalejaco;
+    private GridLayout gridKostki;
+    private TextView textViewWyniki;
+
+    // KROK 4: Lista przechowująca wylosowane wyniki oraz generator liczb losowych
+    private List<Integer> wynikiLosowania = new ArrayList<>();
+    private Random randomGenerator = new Random();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // KROK 5: Inicjalizacja elementów interfejsu przy pomocy findViewById
+        editTextLiczbaKostek = findViewById(R.id.editTextLiczbaKostek);
+        buttonLosuj = findViewById(R.id.buttonLosuj);
+        buttonRosnaco = findViewById(R.id.buttonRosnaco);
+        buttonMalejaco = findViewById(R.id.buttonMalejaco);
+        gridKostki = findViewById(R.id.gridKostki);
+        textViewWyniki = findViewById(R.id.textViewWyniki);
+
+        // KROK 5: Przypisanie działań do przycisku "Losuj"
+        buttonLosuj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                uruchomLosowanie();
+            }
+        });
+
+        // KROK 5: Przypisanie działań do przycisku "Rosnąco"
+        buttonRosnaco.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Sprawdzenie, czy lista wyników jest pusta przed sortowaniem
+                if (wynikiLosowania.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Najpierw wylosuj kostki!", Toast.LENGTH_SHORT).show();
+                } else {
+                    sortujWyniki(true);
+                }
+            }
+        });
+
+        // KROK 5: Przypisanie działań do przycisku "Malejąco"
+        buttonMalejaco.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Sprawdzenie, czy lista wyników jest pusta przed sortowaniem
+                if (wynikiLosowania.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Najpierw wylosuj kostki!", Toast.LENGTH_SHORT).show();
+                } else {
+                    sortujWyniki(false);
+                }
+            }
+        });
+    }
+
+    /**
+     * KROK 6: Tworzenie funkcji losowania
+     */
+    private void uruchomLosowanie() {
+        // 1. Odczytać liczbę wpisaną przez użytkownika
+        String pobranyTekst = editTextLiczbaKostek.getText().toString().trim();
+        int liczbaKostek = 0;
+
+        // 2. Sprawdzić, czy podana wartość jest prawidłową liczbą całkowitą
+        try {
+            liczbaKostek = Integer.parseInt(pobranyTekst);
+        } catch (NumberFormatException e) {
+            // 5. W przypadku błędnych danych wyświetlić odpowiedni komunikat
+            Toast.makeText(this, "Wprowadź prawidłową liczbę całkowitą!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 3. Sprawdzić, czy liczba jest większa od zera
+        if (liczbaKostek <= 0) {
+            // 5. W przypadku błędnych danych wyświetlić odpowiedni komunikat
+            Toast.makeText(this, "Liczba kostek must be większa od zera!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 4. Sprawdzić, czy liczba nie przekracza 100
+        if (liczbaKostek > 100) {
+            // 5. W przypadku błędnych danych wyświetlić odpowiedni komunikat
+            Toast.makeText(this, "Maksymalna liczba kostek to 100!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 6. Usunąć poprzednie wyniki losowania
+        wynikiLosowania.clear();
+        gridKostki.removeAllViews();
+
+        // 7. Wylosować wskazaną przez użytkownika liczbę wyników
+        for (int i = 0; i < liczbaKostek; i++) {
+            // 8. Każdy wynik powinien być liczbą z zakresu od 1 do 6
+            int oczka = randomGenerator.nextInt(6) + 1;
+            
+            // 9. Zapisać wszystkie wyniki na liście
+            wynikiLosowania.add(oczka);
+        }
+
+        // 10. Wywołać metodę odświeżającą widok aplikacji
+        odswiezWidokAplikacji();
+    }
+
+    /**
+     * Metoda sortująca listę wyników.
+     * @param rosnaco true dla sortowania rosnącego, false dla malejącego
+     */
+    private void sortujWyniki(boolean rosnaco) {
+        if (rosnaco) {
+            Collections.sort(wynikiLosowania);
+        } else {
+            Collections.sort(wynikiLosowania, Collections.reverseOrder());
+        }
+
+        // Po posortowaniu wywołujemy odświeżenie widoku interfejsu
+        odswiezWidokAplikacji();
+    }
+
+    /**
+     * Zbiorcza metoda odświeżająca cały interfejs graficzny aplikacji
+     * (czyści stary grid, generuje kostki na nowo i aktualizuje napis z wynikami).
+     */
+    private void odswiezWidokAplikacji() {
+        // Czyszczenie widoku siatki przed dodaniem nowych elementów
+        gridKostki.removeAllViews();
+        
+        // Ustawienie liczby kolumn w siatce na 5, żeby kostki ładnie się układały obok siebie
+        gridKostki.setColumnCount(5);
+
+        // Dynamiczne generowanie graficznych kostek (kwadratów) w układzie GridLayout
+        for (int oczka : wynikiLosowania) {
+            TextView kostkaView = new TextView(this);
+            kostkaView.setText(String.valueOf(oczka));
+            kostkaView.setTextSize(24);
+            kostkaView.setTypeface(null, android.graphics.Typeface.BOLD);
+            kostkaView.setGravity(android.view.Gravity.CENTER);
+
+            // Nadanie prostego wyglądu ramki za pomocą wbudowanego zasobu Androida
+            kostkaView.setBackgroundResource(android.R.drawable.editbox_background);
+            kostkaView.setPadding(35, 35, 35, 35);
+
+            // Ustawienie marginesów dla każdej kostki
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.setMargins(12, 12, 12, 12);
+            kostkaView.setLayoutParams(params);
+
+            gridKostki.addView(kostkaView);
+        }
+
+        // Budowanie i aktualizacja napisu podsumowującego w TextView
+        StringBuilder sb = new StringBuilder("Wyniki: ");
+        for (int i = 0; i < wynikiLosowania.size(); i++) {
+            sb.append(wynikiLosowania.get(i));
+            if (i < wynikiLosowania.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        textViewWyniki.setText(sb.toString());
+    }
+}
